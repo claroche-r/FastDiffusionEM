@@ -5,7 +5,6 @@ import torch.nn.functional as F
 from torch import nn
 from torch.autograd import Variable
 import matplotlib.pyplot as plt
-from motionblur.motionblur import Kernel
 from .fastmri_utils import fft2c_new, ifft2c_new
 
 

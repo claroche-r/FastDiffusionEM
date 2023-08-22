@@ -8,7 +8,6 @@ from tqdm import tqdm
 import util.utils_agem as agem
 from networks.network_dncnn import FDnCNN as net_kernel
 
-from util.img_utils import clear_color
 import util.utils_image as util
 from .posterior_mean_variance import get_mean_processor, get_var_processor
 import cv2
@@ -206,7 +205,7 @@ class GaussianDiffusion:
             if record:
                 if idx % 10 == 0:
                     file_path = os.path.join(save_root, f"progress/x_{str(idx).zfill(4)}.png")
-                    plt.imsave(file_path, clear_color(img))
+                    plt.imsave(file_path, util.tensor2uint(img))
 
         return img       
         
@@ -478,7 +477,7 @@ class BlindDPS(DDPM):
                         if not os.path.isdir(save_dir):
                             os.makedirs(save_dir, exist_ok=True)
                         file_path = os.path.join(save_dir, f"x_{str(idx).zfill(4)}.png")
-                        plt.imsave(file_path, clear_color(v))
+                        plt.imsave(file_path, util.tensor2uint(v))
 # 
         return updated
 
@@ -523,7 +522,7 @@ class DPS(DDPM):
             if record:
                 if idx % 10 == 0:
                     file_path = os.path.join(save_root, f"progress/x_{str(idx).zfill(4)}.png")
-                    plt.imsave(file_path[:-4] + '_E.png', clear_color(img[0]))
+                    plt.imsave(file_path[:-4] + '_E.png', util.tensor2uint(img[0]))
 
         return img
 
@@ -587,7 +586,7 @@ class EMDPS(DDPM):
             if record:
                 if idx % 10 == 0:
                     file_path = os.path.join(save_root, f"progress/x_{str(idx).zfill(4)}.png")
-                    plt.imsave(file_path[:-4] + '_E.png', clear_color(img[0]))
+                    plt.imsave(file_path[:-4] + '_E.png', util.tensor2uint(img[0]))
                     k_np = k_0[0,0].cpu().detach.numpy()
                     k_np /= k_np.max()
                     util.imsave(k_np, file_path[:-4] + '_ker.png')
@@ -643,7 +642,7 @@ class PiGDM(DDPM):
             if record:
                 if idx % 10 == 0:
                     file_path = os.path.join(save_root, f"progress/x_{str(idx).zfill(4)}.png")
-                    plt.imsave(file_path, clear_color(img))
+                    plt.imsave(file_path, util.tensor2uint(img))
 
         return ((img + 1)/2).clamp(0, 1)
 
@@ -715,8 +714,8 @@ class EMPiGDM(DDPM):
             if record:
                 if idx % 1 == 0:
                     file_path = os.path.join(save_root, f"progress/x_{str(idx).zfill(4)}.png")
-                    plt.imsave(file_path[:-4] + '_E.png', clear_color(img))
-                    plt.imsave(file_path[:-4] + '_x0_hat.png', clear_color(x0_hat))
+                    plt.imsave(file_path[:-4] + '_E.png', util.tensor2uint(img))
+                    plt.imsave(file_path[:-4] + '_x0_hat.png', util.tensor2uint(x0_hat))
                     k_np = k_0[0,0].cpu().detach().numpy()
                     k_np /= k_np.max()
                     util.imsave(cv2.resize((k_np * 255).astype(np.uint8), fx=4, fy=4, dsize=None, interpolation=cv2.INTER_NEAREST), file_path[:-4] + '_ker.png')

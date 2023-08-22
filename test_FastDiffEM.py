@@ -6,7 +6,6 @@ import pickle
 
 import numpy as np
 import torch
-import matplotlib.pyplot as plt
 
 from guided_diffusion.unet import create_model
 from guided_diffusion.gaussian_diffusion import create_sampler
@@ -29,6 +28,7 @@ def main():
 
     # Training
     parser.add_argument('--gpu', type=int, default=0)
+    parser.add_argument('--input_dir', type=str, default='./testset')
     parser.add_argument('--save_dir', type=str, default='./results')
 
     args = parser.parse_args()
@@ -65,7 +65,7 @@ def main():
     np.random.seed(123)
 
 
-    dir = 'testset'
+    dir = args.input_dir
     paths = os.listdir(dir)
 
     for path in paths:
@@ -74,7 +74,7 @@ def main():
 
         y_n = sample['L'].to('cuda')
         H = sample['H']
-        ker = sample['ker']
+        ker = sample['kernel']
         sigma = sample['sigma']
         
         fname = os.path.split(path)[-1][:-7]
@@ -89,13 +89,13 @@ def main():
         ker_est = sample[1].detach().cpu()
         
         # GT
-        util.imwrite(util.tensor2uint(H), os.path.join(os.path.join(out_path, 'label') ,  fname + 'H_.png'))
-        util.imwrite(util.tensor2uint(ker), os.path.join(os.path.join(out_path, 'label') ,  fname + 'ker_.png'))
+        util.imwrite(util.tensor2uint(H), os.path.join(os.path.join(out_path, 'label') ,  fname + '_H.png'))
+        util.imwrite(util.tensor2uint(ker/ker.max()), os.path.join(os.path.join(out_path, 'label') ,  fname + '_ker.png'))
         # Input
         util.imwrite(util.tensor2uint(y_n), os.path.join(os.path.join(out_path, 'input') ,  fname + '.png'))
         # Results
-        util.imwrite(util.tensor2uint(est), os.path.join(os.path.join(out_path, 'recon') ,  fname + 'E_.png'))
-        util.imwrite(util.tensor2uint(ker_est/ker_est.max()), os.path.join(os.path.join(out_path, 'recon') ,  fname + 'ker_.png'))
+        util.imwrite(util.tensor2uint(est), os.path.join(os.path.join(out_path, 'recon') ,  fname + '_E.png'))
+        util.imwrite(util.tensor2uint(ker_est/ker_est.max()), os.path.join(os.path.join(out_path, 'recon') ,  fname + '_ker.png'))
 
 if __name__ == '__main__':
     main()
