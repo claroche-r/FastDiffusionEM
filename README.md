@@ -1,5 +1,7 @@
 # Fast Diffusion EM
 
+[Arxiv version  of the article](https://arxiv.org/pdf/2309.00287.pdf)
+
 This repository implement the code for the article: **Fast Diffusion EM: a diffusion model for blind inverse problems with application to deconvolution.**
 
 ## Abstract
@@ -18,3 +20,16 @@ python test_FastDiffEM.py --diffusion_config 'configs/diffusion_config_fastem_pi
 ```
 you can also replace "pigdm" diffusion by "dps" in the code.
 
+## Acknowledgement
+The codes use [DPS](https://github.com/DPS2022/diffusion-posterior-sampling) as code base.
+
+## Citation
+If you use our work, please cite us with the following:
+```
+@InProceedings{laroche2024fastem,
+  title = {Fast Diffusion EM: a diffusion model for blind inverse problems with application to deconvolution},
+  author = {Laroche, Charles and Almansa, Andr\'{e}s and Eva Coupet\'{e}},
+  booktitle = {IEEE/CVF Winter Conference on Applications of Computer Vision (WACV)}
+  year = {2024}
+}
+```
