@@ -8,6 +8,15 @@ This repository implement the code for the article: **Fast Diffusion EM: a diffu
 Using diffusion models to solve inverse problems is a growing field of research. Current methods assume the degradation to be known and provide impressive results in terms of restoration quality and diversity. In this work, we leverage the efficiency of those models to jointly estimate the restored image and unknown parameters of the degradation model. In particular, we designed an algorithm based on the well-known Expectation-Minimization (EM) estimation method and diffusion models. Our method alternates between approximating the expected log-likelihood of the inverse problem using samples drawn from a diffusion model and a maximization step to estimate unknown model parameters. For the maximization step, we also introduce a novel blur kernel regularization based on a Plug \& Play denoiser. Diffusion models are long to run, thus we provide a fast version of our algorithm. Extensive experiments on blind image deblurring demonstrate the effectiveness of our method when compared to other state-of-the-art approaches.
 
 ## Run model
+
+**Setup:**
+
+For the diffusion model, feel free to use your favorite pre-trained model. In our experiments we used the model pre-trained by the authors of [DPS](https://github.com/DPS2022/diffusion-posterior-sampling). 
+
+For the blur kernel Plug & Play regularization, the weights can be found here: https://drive.google.com/drive/folders/1pueQC9FI0ozoSUiu4u1MlJR52zYSnvKr?usp=share_link
+
+In the paper's experiments, we used the kernel_denoiser_33.pth model which is trained on 33x33 blur kernels. Using the 64x64 model might requires some tuning.
+
 **Diffusion EM:**
 ``` 
 python test_DiffEM.py --diffusion_config 'configs/diffusion_config_pigdm.yaml' --input_dir 'testset' --save_dir './results'
