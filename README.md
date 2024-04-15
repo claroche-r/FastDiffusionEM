@@ -32,6 +32,8 @@ you can also replace "pigdm" diffusion by "dps" in the code.
 ## Acknowledgement
 The codes use [DPS](https://github.com/DPS2022/diffusion-posterior-sampling) as code base.
 
+Our blur kernels are available for download [here](https://drive.google.com/file/d/1o1ruvDSbR9R12DzjA-2KIps7cqy4544v/view?usp=share_link).
+
 ## Citation
 If you use our work, please cite us with the following:
 ```
