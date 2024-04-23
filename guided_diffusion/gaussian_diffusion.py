@@ -544,6 +544,7 @@ class EMDPS(DDPM):
                       measurement,
                       record,
                       save_root,
+                      ksize=33,
                       sigma=0.02):
         """
         The function used for sampling from noise.
@@ -551,9 +552,18 @@ class EMDPS(DDPM):
         img = x_start
         device = x_start.device
         
-        k_0 = self.init_ker(ksize=33, device=device)
+        k_0 = self.init_ker(ksize=ksize, device=device)
+        print(k_0.shape)
 
-        reg_path = 'model_zoo/kernel_denoiser.pth'
+        if ksize==33:
+            reg_path = 'model_zoo/kernel_denoiser.pth'
+            lamb=1.0
+        elif ksize==64:
+            reg_path = 'model_zoo/kernel_denoiser_64.pth'
+            lamb=0.2
+        else:
+            raise NotImplementedError("Please use 33 or 64 for the kernel size")
+        
         kernel_denoiser = self.load_network(net_kernel(in_nc=2, out_nc=1, nb=5, nc=32), reg_path, device=device)
         M_step = lambda y, x, sigma, k, lamb: agem.HQS_ker(y, x, sigma, k, denoiser=kernel_denoiser,
                                                            lamb=lamb, reg='pnp', n_iter=10)
@@ -568,7 +578,7 @@ class EMDPS(DDPM):
             out = self.p_sample(x=img, t=time, model=model)
 
             with torch.no_grad():
-                k_0 = M_step(measurement, out['pred_xstart'], sigma, k_0, 1.0)
+                k_0 = M_step(measurement, out['pred_xstart'], sigma, k_0, lamb)
                 k_0 = torch.FloatTensor(agem.kernel_shift(k_0[0,0].cpu().numpy(), 1)).to('cuda')[None, None]
             
             # Give condition.
@@ -664,6 +674,7 @@ class EMPiGDM(DDPM):
                       measurement,
                       record,
                       save_root,
+                      ksize=33,
                       sigma=0.02):
         """
         The function used for sampling from noise.
@@ -671,12 +682,20 @@ class EMPiGDM(DDPM):
         img = x_start
         device = x_start.device
         
-        k_0 = self.init_ker(ksize=33, device=device)
+        k_0 = self.init_ker(ksize=ksize, device=device)
 
-        reg_path = 'model_zoo/kernel_denoiser.pth'
+        if ksize==33:
+            reg_path = 'model_zoo/kernel_denoiser.pth'
+            lamb = 1.0
+        elif ksize==64:
+            reg_path = 'model_zoo/kernel_denoiser_64.pth'
+            lamb = 0.2
+        else:
+            raise NotImplementedError("Please use 33 or 64 for the kernel size")
+        
         kernel_denoiser = self.load_network(net_kernel(in_nc=2, out_nc=1, nb=5, nc=32), reg_path, device=device)
         M_step = lambda y, x, sigma, k, lamb: agem.HQS_ker(y, x, sigma, k, denoiser=kernel_denoiser,
-                                                           lamb=lamb, reg='pnp', n_iter=10)
+                                                           lamb=lamb, reg='pnp', n_iter=10, ksize=ksize)
 
         pbar = tqdm(list(range(self.num_timesteps))[::-1])
         for idx in pbar:
@@ -688,7 +707,7 @@ class EMPiGDM(DDPM):
             x0_hat = ((out['pred_xstart'] + 1)/2).clamp(0, 1)
 
             with torch.no_grad():
-                k_0 = M_step(measurement, x0_hat, sigma, k_0, 1.0)
+                k_0 = M_step(measurement, x0_hat, sigma, k_0, lamb)
                 k_0 = torch.FloatTensor(agem.kernel_shift(k_0[0,0].cpu().numpy(), 1)).to('cuda')[None, None]
             
             # Give condition.
